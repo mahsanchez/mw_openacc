@@ -1,0 +1,155 @@
+
+ rm -f *.o miniWeather
+ pgc++ -O3 -w -ta=tesla:managed -Minfo=accel  -o miniWeather miniWeather_openacc.cpp -I/opt/nvidia/hpc_sdk/Linux_x86_64/20.9/cuda/11.0/include -lnetcdf -ldl
+ main:
+     167, Generating copyin(hy_pressure_int[:nz+1],state[:((nz+4)*(nx+4))*4],tend[:(nz*nx)*4],state_tmp[:((nz+4)*(nx+4))*4],hy_dens_cell[:nz+4],hy_dens_theta_cell[:nz+4],flux[:((nz+1)*(nx+1))*4]) [if not already present]
+     196, Generating update self(state[:((nz+4)*(nx+4))*4])
+ semi_discrete_step(double *, double *, double *, double, int, double *, double *):
+     282, Generating present(state_init[:((nz+4)*(nx+4))*4],state_out[:((nz+4)*(nx+4))*4],tend[:(nz*nx)*4])
+          Generating Tesla code
+         282, #pragma acc loop gang, vector(32) collapse(2) /* blockIdx.x threadIdx.x */
+         284,   /* blockIdx.x threadIdx.x collapsed */
+ compute_tendencies_x(double *, double *, double *):
+     311, Generating present(hy_dens_theta_cell[:nz+4],state[:((nz+4)*(nx+4))*4],flux[:((nz+1)*(nx+1))*4])
+          Generating Tesla code
+         311, #pragma acc loop gang collapse(2) /* blockIdx.x */
+         313,   /* blockIdx.x collapsed */
+         316, #pragma acc loop seq
+         318, #pragma acc loop vector(32) /* threadIdx.x */
+     311, CUDA shared memory used for d3_vals,stencil,vals
+          Generating implicit copyin(hy_dens_cell[2:nz]) [if not already present]
+     316, Loop carried reuse of stencil prevents parallelization
+     318, Loop is parallelizable
+     353, Generating present(tend[:(nz*nx)*4],flux[:((nz+1)*(nx+1))*4])
+          Generating Tesla code
+         353, #pragma acc loop gang, vector(32) collapse(2) /* blockIdx.x threadIdx.x */
+         355,   /* blockIdx.x threadIdx.x collapsed */
+ compute_tendencies_z(double *, double *, double *):
+     383, Generating present(hy_pressure_int[:nz+1],state[:((nz+4)*(nx+4))*4],flux[:((nz+1)*(nx+1))*4])
+          Generating Tesla code
+         383, #pragma acc loop gang, vector(32) collapse(2) /* blockIdx.x threadIdx.x */
+         385,   /* blockIdx.x threadIdx.x collapsed */
+         388, #pragma acc loop seq
+         390, #pragma acc loop seq
+     383, Local memory used for d3_vals,stencil,vals
+          Generating implicit copyin(hy_dens_theta_int[:nz+1],hy_dens_int[:nz+1]) [if not already present]
+     388, Loop carried reuse of stencil prevents parallelization
+          Complex loop carried dependence of vals,stencil,state->,d3_vals prevents parallelization
+     390, Complex loop carried dependence of state->,stencil prevents parallelization
+     425, Generating present(flux[:((nz+1)*(nx+1))*4],tend[:(nz*nx)*4],state[:((nz+4)*(nx+4))*4])
+          Generating Tesla code
+         425, #pragma acc loop gang, vector(32) collapse(2) /* blockIdx.x threadIdx.x */
+         427,   /* blockIdx.x threadIdx.x collapsed */
+ set_halo_values_x(double *):
+     452, Generating present(state[:((nz+4)*(nx+4))*4])
+          Generating Tesla code
+         452, #pragma acc loop gang, vector(32) /* blockIdx.x threadIdx.x */
+     466, Generating present(state[:((nz+4)*(nx+4))*4],hy_dens_theta_cell[:nz+4],hy_dens_cell[:nz+4])
+          Generating Tesla code
+         466, #pragma acc loop gang, vector(32) collapse(2) /* blockIdx.x threadIdx.x */
+         468,   /* blockIdx.x threadIdx.x collapsed */
+ set_halo_values_z(double *):
+     498, Generating present(state[:((nz+4)*(nx+4))*4])
+          Generating Tesla code
+         498, #pragma acc loop gang, vector(32) /* blockIdx.x threadIdx.x */
+ std::abs(double):
+       1, include "iostream"
+           35, include "iostream"
+                 4, include "ostream"
+                     38, include "ios"
+                          42, include "ios_base.h"
+                               41, include "locale_classes.h"
+                                    40, include "string"
+                                         55, include "basic_string.h"
+                                            6493, include "string_conversions.h"
+                                                   41, include "cstdlib"
+                                                        13, include "cstdlib"
+                                                             77, include "std_abs.h"
+                                                                  72, Generating implicit acc routine seq
+                                                                      Generating acc routine seq
+                                                                      Generating Tesla code
+
+ Complete. Execution time is = 11.630973 seconds
+
+
+
+  Complete. Execution time is = 23.698066 seconds
+ Processing events...
+ Capturing symbol files...
+ Saving temporary "/tmp/nsys-report-913d-5e11-c3f2-248c.qdstrm" file to disk...
+ Creating final output files...
+
+ Processing [==============================================================100%]
+ Saved report file to "/tmp/nsys-report-913d-5e11-c3f2-248c.qdrep"
+ Exporting 6764884 events: [===============================================100%]
+
+ Exported successfully to
+ /tmp/nsys-report-913d-5e11-c3f2-248c.sqlite
+
+ Generating CUDA API Statistics...
+ CUDA API Statistics (nanoseconds)
+
+ Time(%)      Total Time       Calls         Average         Minimum         Maximum  Name
+ -------  --------------  ----------  --------------  --------------  --------------  --------------------------------------------------------------------------------
+    61.9      8255312918      297000         27795.7            1531        23012828  cuStreamSynchronize
+    33.6      4487250763      729000          6155.4            3332        22045156  cuLaunchKernel
+     4.3       576056287      162000          3555.9            1601        17714737  cuCtxSynchronize
+     0.2        20513051           1      20513051.0        20513051        20513051  cuMemAllocManaged
+     0.0         3092990           5        618598.0            3338         1110932  cuMemAllocHost_v2
+     0.0          971229           5        194245.8            5078          431429  cuMemAlloc_v2
+     0.0          432622           1        432622.0          432622          432622  cuModuleLoadDataEx
+     0.0           35869           5          7173.8            3523           16864  cuStreamCreate
+     0.0            2300           4           575.0             447             757  cuEventCreate
+
+
+
+
+ Generating CUDA Kernel Statistics...
+ CUDA Kernel Statistics (nanoseconds)
+
+ Time(%)      Total Time   Instances         Average         Minimum         Maximum  Name
+ -------  --------------  ----------  --------------  --------------  --------------  --------------------------------------------------------------------------------------------------------------------
+    66.0      5972032459       27000        221186.4          218942         1824700  compute_tendencies_x_311_gpu(double*, double*, double*)
+    12.4      1121080573      216000          5190.2            4928         1012108  semi_discrete_step_282_gpu(double*, double*, double*, double, int, double*, double*)
+     6.2       558043615      108000          5167.1            4992           13858  compute_tendencies_z_425_gpu(double*, double*, double*)
+     6.0       546499590      108000          5060.2            4928         1287089  compute_tendencies_x_353_gpu(double*, double*, double*)
+     3.8       347642448       27000         12875.6           11938           21219  compute_tendencies_z_383_gpu(double*, double*, double*)
+     3.1       284189929      108000          2631.4            1376         1594667  set_halo_values_x_452_gpu(double*)
+     1.8       162833566      108000          1507.7            1024           13698  set_halo_values_z_498_gpu(double*)
+     0.6        50649245       27000          1875.9            1664          300457  set_halo_values_x_466_gpu(double*)
+
+
+
+ Generating CUDA Memory Operation Statistics...
+ CUDA Memory Operation Statistics (nanoseconds)
+
+ Time(%)      Total Time  Operations         Average         Minimum         Maximum  Name
+ -------  --------------  ----------  --------------  --------------  --------------  --------------------------------------------------------------------------------
+    63.7         7443490        1201          6197.7            2432           93933  [CUDA Unified Memory memcpy HtoD]
+    36.3         4232682         690          6134.3            1504           52104  [CUDA Unified Memory memcpy DtoH]
+
+
+ CUDA Memory Operation Statistics (KiB)
+
+               Total      Operations              Average            Minimum              Maximum  Name
+ -------------------  --------------  -------------------  -----------------  -------------------  --------------------------------------------------------------------------------
+           50496.000            1201               42.045              4.000              976.000  [CUDA Unified Memory memcpy HtoD]
+           44032.000             690               63.814              4.000              508.000  [CUDA Unified Memory memcpy DtoH]
+
+
+
+
+ Generating NVTX Push-Pop Range Statistics...
+ NVTX Push-Pop Range Statistics (nanoseconds)
+
+ Time(%)      Total Time   Instances         Average         Minimum         Maximum  Range
+ -------  --------------  ----------  --------------  --------------  --------------  -------------------
+    33.8     24117943229           1   24117943229.0     24117943229     24117943229  init
+    33.2     23698066623           1   23698066623.0     23698066623     23698066623  while
+    32.6     23257003483        9000       2584111.5         1859191      1854667339  perform_timestep
+     0.3       210605122        9000         23400.6             143        17154800  copy_state
+
+
+
+ Report file moved to "/home/u00uanklohtYGXxB4H357/openacc-mini-weather-labs/C/source_code/miniWeather_acc_tesla_managed_profile.qdrep"
+ Report file moved to "/home/u00uanklohtYGXxB4H357/openacc-mini-weather-labs/C/source_code/miniWeather_acc_tesla_managed_profile.sqlite"

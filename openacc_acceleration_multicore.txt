@@ -1,0 +1,66 @@
+Serial
+Complete. Execution time is = 307.842808 seconds
+
+!export ACC_NUM_CORES=80;cd ../source_code && ./miniWeather
+
+srun --pty --cpus-per-task=8 --gpus 1 bash
+
+!export ACC_NUM_CORES=8;cd ../source_code && ./miniWeather
+
+Multicore
+Complete. Execution time is =80.711 seconds
+Complete. Execution time is = 82.222548 seconds     (3.74) speedup
+
+profile
+!export ACC_NUM_CORES=8;cd ../source_code && nsys profile -t nvtx,openacc --stats=true --force-overwrite true -o miniWeather_multicore_profile ./miniWeather
+
+rm -f *.o miniWeather
+pgc++ -O3 -w -ta=multicore -Minfo=accel -o miniWeather miniWeather_multicore.cpp -I/opt/nvidia/hpc_sdk/Linux_x86_64/20.9/cuda/11.0/include -lnetcdf -ldl
+semi_discrete_step(double *, double *, double *, double, int, double *, double *):
+    266, Generating Multicore code
+        266, #pragma acc loop gang
+    269, Loop is parallelizable
+    271, Accelerator restriction: size of the GPU copy of state_init,tend,state_out is unknown
+         Loop is parallelizable
+compute_tendencies_x(double *, double *, double *):
+    297, Accelerator restriction: size of the GPU copy of flux is unknown
+         Generating Multicore code
+        297, #pragma acc loop gang
+    302, Loop carried reuse of stencil prevents parallelization
+    304, Accelerator restriction: size of the GPU copy of state is unknown
+         Loop is parallelizable
+    337, Generating Multicore code
+        337, #pragma acc loop gang
+    340, Loop is parallelizable
+    342, Accelerator restriction: size of the GPU copy of tend,flux is unknown
+         Loop is parallelizable
+compute_tendencies_z(double *, double *, double *):
+    369, Accelerator restriction: size of the GPU copy of flux is unknown
+         Generating Multicore code
+        369, #pragma acc loop gang
+    374, Loop carried reuse of stencil prevents parallelization
+         Complex loop carried dependence of vals,stencil,state->,d3_vals prevents parallelization
+    376, Accelerator restriction: size of the GPU copy of state is unknown
+         Complex loop carried dependence of stencil,state-> prevents parallelization
+    408, Generating Multicore code
+        408, #pragma acc loop gang
+    411, Loop is parallelizable
+    413, Accelerator restriction: size of the GPU copy of tend,state,flux is unknown
+         Loop is parallelizable
+set_halo_values_x(double *):
+    435, Generating Multicore code
+        435, #pragma acc loop gang
+    438, Accelerator restriction: size of the GPU copy of state is unknown
+         Loop is parallelizable
+    451, Generating Multicore code
+        451, #pragma acc loop gang
+    453, Accelerator restriction: size of the GPU copy of state is unknown
+         Complex loop carried dependence of hy_dens_cell->,state-> prevents parallelization
+         Loop carried reuse of state-> prevents parallelization
+         Complex loop carried dependence of hy_dens_theta_cell-> prevents parallelization
+set_halo_values_z(double *):
+    481, Accelerator restriction: size of the GPU copy of state is unknown
+         Generating Multicore code
+        481, #pragma acc loop gang
+    484, Loop is parallelizable
+

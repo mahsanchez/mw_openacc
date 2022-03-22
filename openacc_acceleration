@@ -1,0 +1,120 @@
+rm -f *.o miniWeather
+pgc++ -O3 -w -ta=tesla:managed -Minfo=accel  -o miniWeather miniWeather_openacc.cpp -I/opt/nvidia/hpc_sdk/Linux_x86_64/20.9/cuda/11.0/include -lnetcdf -ldl
+semi_discrete_step(double *, double *, double *, double, int, double *, double *):
+rm -f *.o miniWeather
+pgc++ -O3 -w -ta=tesla:managed -Minfo=accel  -o miniWeather miniWeather_openacc.cpp -I/opt/nvidia/hpc_sdk/Linux_x86_64/20.9/cuda/11.0/include -lnetcdf -ldl
+semi_discrete_step(double *, double *, double *, double, int, double *, double *):
+    264, Generating Tesla code
+        264, #pragma acc loop gang, vector(32) collapse(2) /* blockIdx.x threadIdx.x */
+        266,   /* blockIdx.x threadIdx.x collapsed */
+    264, Generating implicit copyout(state_out[:]) [if not already present]
+         Generating implicit copyin(tend[:],state_init[:]) [if not already present]
+compute_tendencies_x(double *, double *, double *):
+    293, Generating Tesla code
+        293, #pragma acc loop gang collapse(2) /* blockIdx.x */
+        295,   /* blockIdx.x collapsed */
+        298, #pragma acc loop seq
+        300, #pragma acc loop vector(32) /* threadIdx.x */
+    293, CUDA shared memory used for d3_vals,stencil,vals
+         Generating implicit copyin(hy_dens_cell[2:nz]) [if not already present]
+         Generating implicit copyout(flux[:]) [if not already present]
+         Generating implicit copyin(hy_dens_theta_cell[2:nz],state[:]) [if not already present]
+    298, Loop carried reuse of stencil prevents parallelization
+    300, Loop is parallelizable
+    335, Generating Tesla code
+        335, #pragma acc loop gang, vector(32) collapse(2) /* blockIdx.x threadIdx.x */
+        337,   /* blockIdx.x threadIdx.x collapsed */
+    335, Generating implicit copyout(tend[:]) [if not already present]
+         Generating implicit copyin(flux[:]) [if not already present]
+compute_tendencies_z(double *, double *, double *):
+    365, Generating Tesla code
+        365, #pragma acc loop gang, vector(32) collapse(2) /* blockIdx.x threadIdx.x */
+        367,   /* blockIdx.x threadIdx.x collapsed */
+        370, #pragma acc loop seq
+        372, #pragma acc loop seq
+    365, Local memory used for d3_vals,stencil,vals
+         Generating implicit copyin(hy_dens_theta_int[:nz+1],hy_dens_int[:nz+1]) [if not already present]
+         Generating implicit copyout(flux[:]) [if not already present]
+         Generating implicit copyin(state[:],hy_pressure_int[:nz+1]) [if not already present]
+    370, Loop carried reuse of stencil prevents parallelization
+         Complex loop carried dependence of vals,stencil,state->,d3_vals prevents parallelization
+    372, Complex loop carried dependence of state->,stencil prevents parallelization
+    407, Generating Tesla code
+        407, #pragma acc loop gang, vector(32) collapse(2) /* blockIdx.x threadIdx.x */
+        409,   /* blockIdx.x threadIdx.x collapsed */
+    407, Generating implicit copy(tend[:]) [if not already present]
+         Generating implicit copyin(state[:],flux[:]) [if not already present]
+set_halo_values_x(double *):
+    434, Generating Tesla code
+        434, #pragma acc loop gang, vector(32) /* blockIdx.x threadIdx.x */
+    434, Generating implicit copy(state[:]) [if not already present]
+    448, Generating Tesla code
+        448, #pragma acc loop gang, vector(32) collapse(2) /* blockIdx.x threadIdx.x */
+        450,   /* blockIdx.x threadIdx.x collapsed */
+    448, Generating implicit copyin(hy_dens_cell[2:nz]) [if not already present]
+         Generating implicit copy(state[:]) [if not already present]
+         Generating implicit copyin(hy_dens_theta_cell[2:nz]) [if not already present]
+set_halo_values_z(double *):
+    480, Generating Tesla code
+        480, #pragma acc loop gang, vector(32) /* blockIdx.x threadIdx.x */
+    480, Generating implicit copyin(state[:]) [if not already present]
+         Generating implicit copyout(state[((nx+4)*(ll*(nz+4)))+((nx+4)*(nz+3)):nx+4]) [if not already present]
+std::abs(double):
+      1, include "iostream"
+          35, include "iostream"
+                4, include "ostream"
+                    38, include "ios"
+                         42, include "ios_base.h"
+                              41, include "locale_classes.h"
+                                   40, include "string"
+                                        55, include "basic_string.h"
+                                           6493, include "string_conversions.h"
+                                                  41, include "cstdlib"
+                                                       13, include "cstdlib"
+                                                            77, include "std_abs.h"
+                                                                 72, Generating implicit acc routine seq
+                                                                     Generating acc routine seq
+                                                                     Generating Tesla code
+
+Serial
+Using default values ...
+nx_glob, nz_glob: 400 200
+dx,dz: 50.000000 50.000000
+dt: 0.166667
+*** OUTPUT ***
+Elapsed Time: 0.000000 / 1500.000000
+
+OpenACC
+
+]0;IPython: C/jupyter_notebookGroup 1 has  15  time slices
+Group 2 has  15  time slices
+Target Time Slice =  1
+
+
+** Density **
+Max Absolute Value in File 1 =  0.028405072105484024
+Max Absolute Value in File 2 =  0.028405072105483636
+Largest Difference between files =  1.268082860939046e-15
+  File 1 Difference Percentage of Max Value =  4.464283196430343e-12  %
+  File 2 Difference Percentage of Max Value =  4.4642831964304045e-12  %
+
+** U Wind **
+Max Absolute Value in File 1 =  53.64536352123402
+Max Absolute Value in File 2 =  53.64536352123404
+Largest Difference between files =  4.858335955759685e-13
+  File 1 Difference Percentage of Max Value =  9.056394880867288e-13  %
+  File 2 Difference Percentage of Max Value =  9.056394880867285e-13  %
+
+** W Wind **
+Max Absolute Value in File 1 =  30.580407658718638
+Max Absolute Value in File 2 =  30.58040765871881
+Largest Difference between files =  4.134470543704083e-13
+  File 1 Difference Percentage of Max Value =  1.3519998130323561e-12  %
+  File 2 Difference Percentage of Max Value =  1.3519998130323487e-12  %
+
+** Theta **
+Max Absolute Value in File 1 =  0.42834435362641443
+Max Absolute Value in File 2 =  0.4283443536263576
+Largest Difference between files =  1.1368683772161603e-13
+  File 1 Difference Percentage of Max Value =  2.6540991321381892e-11  %
+  File 2 Difference Percentage of Max Value =  2.6540991321385417e-11  %
